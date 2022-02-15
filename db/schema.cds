@@ -2,17 +2,18 @@ namespace sap.capire.bookshop;
 
 using {
     Currency,
-    managed
+    managed,
+    cuid
 } from '@sap/cds/common';
+using {sap.capire.products.Products} from '../../../products';
 
-entity Books : managed, additionalInfo {
-    key ID       : Integer;
-        title    : localized String(111);
-        descr    : localized String(1111);
-        author   : Association to Authors;
-        stock    : Integer;
-        price    : Decimal(9, 2);
-        currency : Currency;
+
+entity Books : Products {
+    author : Association to Authors;
+}
+
+entity Magazines : Products {
+    publisher : String;
 }
 
 entity Authors : managed {
@@ -22,18 +23,16 @@ entity Authors : managed {
                     on books.author = $self;
 }
 
-entity Orders : managed {
-    key ID      : UUID;
-        OrderNo : String @title : 'Order Number'; //> readable key
-        Items   : Composition of many OrderItems
-                      on Items.parent = $self;
+entity Orders : managed, cuid {
+    OrderNo : String @title : 'Order Number'; //> readable key
+    Items   : Composition of many OrderItems
+                  on Items.parent = $self;
 }
 
-entity OrderItems {
-    key ID     : UUID;
-        parent : Association to Orders;
-        book   : Association to Books;
-        amount : Integer;
+entity OrderItems : cuid {
+    parent : Association to Orders;
+    book   : Association to Books;
+    amount : Integer;
 }
 
 entity Movies : additionalInfo {
